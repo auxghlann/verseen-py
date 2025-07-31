@@ -1,22 +1,18 @@
 import os
-import json
 from dotenv import load_dotenv
 from groq import Groq
 
 load_dotenv()
 
-client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY")
-)
+
 
 class VerseenAI:
-
+    
     SYSTEM_BASE_PROMPT = """
     - Give interpretation to the song lyrics provided by the user.
     - Receive song lyrics and title and provide an interpretation of the lyrics.
     - Give interpretation of the song lyrics not exceeding 500 tokens.
     """
-
 
     INTERPRET_FUNCTION = {
         "type":"function",
@@ -34,11 +30,16 @@ class VerseenAI:
                 "required": ["interpretation"]
             }
         }
-    }       
+    }
 
-    @staticmethod
-    def get_response(lyrics: str) -> str | None:
-        response = client.chat.completions.create(
+    def __init__(self):
+        self.client = Groq(
+            api_key=os.getenv("GROQ_API_KEY"),
+        )       
+
+    @property
+    def get_response(self, lyrics: str) -> str | None:
+        response = self.client.chat.completions.create(
             model="deepseek-r1-distill-llama-70b",
             messages=[
                 {"role": "system", "content": VerseenAI.SYSTEM_BASE_PROMPT},
